@@ -99,3 +99,6 @@ Host self-test (no Chrome needed): `powershell -ExecutionPolicy Bypass -File nat
 ## License
 
 LGPL-2.1 (see [LICENSE](LICENSE)).
+
+## Acknowledgements
+Thanks to the [Linux DO](https://linux.do/) community for promotion and support.

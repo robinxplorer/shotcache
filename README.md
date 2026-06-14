@@ -125,3 +125,6 @@ native-host\test-host.ps1`，期待 `PASS v2: ...`（协议）与 `STITCH PASS: 
 ## 许可
 
 LGPL-2.1（见 [LICENSE](LICENSE)）。
+
+## 致谢
+感谢[Linux DO](https://linux.do/)社区的推广支持。
