@@ -2,6 +2,11 @@
 
 **English** · [简体中文](README.md)
 
+<p align="center">
+  <img src="screenshots/shotcache.gif" alt="demostration of ShotCache" width="900">
+</p>
+<p align="center"><em>Demostration of ShotCache</em></p>
+
 A Chrome extension that gives you WeChat-grade screenshotting, a few-day stash tray, and one-click hand-off to AI chats. It's two halves: a Chrome extension (WXT + TypeScript + MV3) and a tiny Windows companion (C#, compiled on your own machine, **no binaries in the repo**). Press `Ctrl+Alt+A` in any app to frame, annotate, or scroll-capture a long screenshot; every shot lands in both the clipboard and a tray, and the stuff you've stashed can be checked off and injected straight into the composer of **Claude / ChatGPT / Gemini**.
 
 <p align="center">

@@ -2,6 +2,11 @@
 
 [English](README.en.md) · **简体中文**
 
+<p align="center">
+  <img src="screenshots/shotcache.gif" alt="应用使用展示" width="900">
+</p>
+<p align="center"><em>应用使用展示</em></p>
+
 微信级截图体验 + 暂存托盘 + 一键发给 AI 的 Chrome 扩展。由 Chrome 扩展
 （WXT + TypeScript + MV3）和一个 Windows 伴生程序（C#，本机编译，仓库零二进制）
 组成：任意应用里按 `Ctrl+Alt+A` 就能在屏幕上框选、标注、滚动长截图，截完同时
