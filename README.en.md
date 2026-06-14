@@ -83,7 +83,11 @@ A few edges worth knowing: the global hotkey only works while Chrome is running 
   &nbsp;&nbsp;
   <img src="screenshots/theme-light.png" alt="Light theme" width="380">
 </p>
-<p align="center"><em>The stash tray — dark (default) and light themes.</em></p>
+<p align="center"><em>The stash tray — dark (default) and light themes.</em></<br>
+<p align="center">
+  <img src="screenshots/shotcache-03.png" alt="push to AI  input box" width="900">
+</p>
+<p align="center"><em>One-click push to AI input box</em></p>p>
 
 ## Development
 
