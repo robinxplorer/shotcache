@@ -23,7 +23,7 @@
       border-radius: 6px; padding: 4px 12px; font: inherit; cursor: pointer;
     }
     header button:hover { border-color: var(--accent); }
-    main { flex: 1; display: grid; grid-template-columns: 1fr 330px 400px; min-height: 0; }
+    main { flex: 1; display: grid; grid-template-columns: 1fr 380px 400px; min-height: 0; }
     .pane { display: flex; flex-direction: column; min-width: 0; border-right: 1px solid var(--line); }
     .pane h2 {
       margin: 0; padding: 6px 12px; font-size: 12px; font-weight: 600;
@@ -75,9 +75,9 @@
       <h2>editor.html — 标注编辑器（真实产物）</h2>
       <iframe id="editor" src="about:blank"></iframe>
     </section>
-    <section class="pane" id="pane-sidepanel">
-      <h2>sidepanel.html — 托盘（真实产物）</h2>
-      <iframe id="sidepanel" src="/sidepanel.html"></iframe>
+    <section class="pane" id="pane-popup">
+      <h2>popup.html — 托盘（真实产物）</h2>
+      <iframe id="popup" src="/popup.html"></iframe>
     </section>
     <section class="pane claude" id="pane-claude">
       <h2 id="claude-title">模拟 claude.ai composer（等待注入…）</h2>
@@ -182,13 +182,13 @@
         const msg = d.msg;
         if (msg?.type === 'SEND_ITEMS') await renderComposer(msg.target, msg.itemIds);
         if (msg?.type === 'REQUEST_CAPTURE') await seedCapture();
-        if (msg?.type === 'TRAY_UPDATED') flash('pane-sidepanel');
+        if (msg?.type === 'TRAY_UPDATED') flash('pane-popup');
       } else if (d.kind === 'open-url') {
         const lb = document.getElementById('lightbox');
         document.getElementById('lightbox-img').src = d.url;
         lb.style.display = 'flex';
-      } else if (d.kind === 'open-sidepanel') {
-        flash('pane-sidepanel');
+      } else if (d.kind === 'open-popup') {
+        flash('pane-popup');
       }
     });
     document.getElementById('lightbox').addEventListener('click', (e) => {

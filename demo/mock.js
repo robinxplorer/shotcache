@@ -1,5 +1,5 @@
 // Browser-extension API mock for the demo harness. Injected into editor.html
-// and sidepanel.html by demo/server.mjs so the real built bundles run in a
+// and popup.html by demo/server.mjs so the real built bundles run in a
 // plain browser tab. Cross-frame runtime messages ride a BroadcastChannel;
 // things only the background/shell can do are postMessage'd to the shell.
 (() => {
@@ -41,8 +41,14 @@
       sendMessage: async () => ({ ok: true }),
     },
     windows: { getCurrent: async () => ({ id: 1 }), update: async () => ({}) },
-    sidePanel: { open: async () => toShell('open-sidepanel') },
-    action: { setBadgeText: async () => {}, setBadgeBackgroundColor: async () => {} },
+    // The tray is an action popup now (no side panel): the user opens it by
+    // clicking the toolbar icon. In the demo it lives in the popup pane, so
+    // openPopup just flashes that pane.
+    action: {
+      openPopup: async () => toShell('open-popup'),
+      setBadgeText: async () => {},
+      setBadgeBackgroundColor: async () => {},
+    },
     alarms: { create: () => {}, onAlarm: { addListener: () => {} } },
   };
   globalThis.chrome = globalThis.browser;

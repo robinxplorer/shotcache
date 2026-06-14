@@ -85,8 +85,6 @@ host 自测（不依赖 Chrome）：`powershell -ExecutionPolicy Bypass -File
 native-host\test-host.ps1`，期待 `PASS v2: ...`（协议）与 `STITCH PASS: ...`
 （长截图拼接合成帧回归）两行。
 
-数据流图、设计决策与理由、完整边界与手测清单见本地 `docs/internals.md`。
-
 ## 许可
 
 LGPL-2.1（见 [LICENSE](LICENSE)）。
