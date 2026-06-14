@@ -1,7 +1,7 @@
 // Send targets — one entry per AI chat site we can inject into.
 // Adding a target = add an entry here + a thin <site>.content.ts that calls
 // setupInjector() with site-specific composer selectors + the host permission
-// in wxt.config.ts. Everything else (sidepanel select, background routing)
+// in wxt.config.ts. Everything else (popup select, background routing)
 // picks it up from this table.
 
 export const TARGETS = {
