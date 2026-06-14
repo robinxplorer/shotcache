@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- WXT lifts this <title> into manifest action.default_title (hover tooltip). -->
+    <title>截存：截图与托盘</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="warn" class="warn" hidden></div>
+    <header class="head">
+      <button id="capture-screen" class="primary big" title="截取整个屏幕 (Alt+Shift+F)">⛶ 开始截图</button>
+      <div class="head-actions">
+        <button id="add-tab" title="把当前标签页链接加入托盘">+ 链接</button>
+        <button id="add-note" title="添加文本备注">+ 备注</button>
+        <button id="add-code" title="添加代码片段">+ 代码</button>
+        <span class="spacer"></span>
+        <button id="settings" class="icon" title="设置">⚙</button>
+        <button id="theme" class="icon" title="切换深色 / 浅色">🌗</button>
+      </div>
+      <div id="settings-panel" class="settings" hidden>
+        <div class="set-row">
+          <span class="set-label">全局截图热键</span>
+          <button id="hk-record" class="hk" title="点击后按下新的组合键">Ctrl+Alt+A</button>
+        </div>
+        <div id="hk-hint" class="set-hint">点按钮后按下组合键（需含 Ctrl / Alt / Win + 一个主键）。</div>
+        <div class="set-actions">
+          <button id="hk-reset">重置默认</button>
+          <button id="hk-save" class="primary">保存</button>
+        </div>
+        <div class="set-divider"></div>
+        <div class="set-row">
+          <span class="set-label">Chrome 内热键（Alt+Shift+F）</span>
+          <button id="open-chrome-shortcuts">去 Chrome 设置</button>
+        </div>
+        <div class="set-hint">扩展无法代改 Chrome 命令快捷键，需在该页手动设置。</div>
+      </div>
+      <div id="composer" class="composer" hidden>
+        <textarea id="composer-text" rows="5"></textarea>
+        <div class="composer-actions">
+          <button id="composer-cancel">取消</button>
+          <button id="composer-save" class="primary">保存</button>
+        </div>
+      </div>
+      <input id="search" class="search" type="search" placeholder="搜索标题 / 内容 / 链接…" />
+    </header>
+
+    <ul id="list" class="list"></ul>
+    <div id="empty" class="empty" hidden>
+      <p>托盘是空的。</p>
+      <p>点上方「⛶ 开始截图」截一张屏幕图，或添加链接 / 备注 / 代码。</p>
+    </div>
+
+    <footer class="foot">
+      <label class="select-all">
+        <input type="checkbox" id="select-all" /> 全选
+      </label>
+      <select id="target" title="发送目标"></select>
+      <button id="delete" class="danger">删除</button>
+      <button id="send" class="primary">发送</button>
+    </footer>
+    <div id="toast" class="toast" hidden></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+:root {
+  /* Ink + Violet (dark, default). Companion light theme below. */
+  --bg: #141317;
+  --panel: #1d1c22;
+  --line: #2f2d36;
+  --text: #ece9f1;
+  --muted: #989299;
+  --accent: #8b7cf0;
+  --accent-strong: #6f5ae8;
+  --on-accent: #ffffff;
+  --shadow: rgba(0,0,0,.5);
+}
+:root[data-theme="light"] {
+  --bg: #f6f5f9;
+  --panel: #ffffff;
+  --line: #e7e3ef;
+  --text: #211e29;
+  --muted: #6f6a78;
+  --accent: #6d5ce6;
+  --accent-strong: #6f5ae8;
+  --on-accent: #ffffff;
+  --shadow: rgba(20,18,30,.18);
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%;
+  background: var(--bg); color: var(--text);
+  font: 14px/1.6 system-ui, "Segoe UI", sans-serif;
+  display: flex; flex-direction: column;
+}
+.bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px 16px; background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand { font-weight: 600; letter-spacing: .04em; color: var(--accent); }
+.tools { display: flex; align-items: center; gap: 6px; flex: 1; }
+.sep { width: 1px; height: 20px; background: var(--line); margin: 0 6px; }
+button {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--line); border-radius: 6px;
+  padding: 5px 12px; font: inherit; cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button.tool.active { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--on-accent); }
+button.primary { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--on-accent); }
+button.primary:hover { filter: brightness(1.08); }
+.stylebar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 16px; background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.widths { display: flex; gap: 4px; }
+.widths button { padding: 2px 10px; font-size: 12px; }
+.widths button.active { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--on-accent); }
+.swatches { display: flex; gap: 6px; }
+.swatch {
+  width: 18px; height: 18px; padding: 0;
+  border: 1px solid var(--line); border-radius: 4px; cursor: pointer;
+}
+.swatch.active { outline: 2px solid var(--accent); outline-offset: 1px; }
+.emojis { display: flex; gap: 2px; flex-wrap: wrap; }
+.emojis button {
+  padding: 1px 4px; font-size: 16px; border: 1px solid transparent;
+  font-family: "Segoe UI Emoji", sans-serif; line-height: 1.3;
+}
+.emojis button.active { border-color: var(--accent); }
+.stage {
+  flex: 1; overflow: auto; display: grid; place-items: center; padding: 24px;
+}
+#canvas {
+  background: #fff;
+  box-shadow: 0 4px 24px var(--shadow);
+  cursor: crosshair;
+  max-width: 100%;
+}
+.status {
+  padding: 6px 16px; color: var(--muted);
+  border-top: 1px solid var(--line); font-size: 12px;
+}

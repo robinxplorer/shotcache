@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shotcache 演示台</title>
+  <style>
+    :root {
+      --bg: #16181d; --panel: #1f2229; --line: #2c313a;
+      --text: #e8eaef; --muted: #8b93a1; --accent: #4f8cff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+      font: 13px/1.6 system-ui, "Segoe UI", sans-serif; }
+    body { display: flex; flex-direction: column; }
+    header {
+      display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+      background: var(--panel); border-bottom: 1px solid var(--line);
+    }
+    header .brand { font-weight: 700; color: var(--accent); }
+    header .note { color: var(--muted); flex: 1; }
+    header button {
+      background: transparent; color: var(--text); border: 1px solid var(--line);
+      border-radius: 6px; padding: 4px 12px; font: inherit; cursor: pointer;
+    }
+    header button:hover { border-color: var(--accent); }
+    main { flex: 1; display: grid; grid-template-columns: 1fr 330px 400px; min-height: 0; }
+    .pane { display: flex; flex-direction: column; min-width: 0; border-right: 1px solid var(--line); }
+    .pane h2 {
+      margin: 0; padding: 6px 12px; font-size: 12px; font-weight: 600;
+      color: var(--muted); background: var(--panel); border-bottom: 1px solid var(--line);
+      letter-spacing: .05em;
+    }
+    .pane iframe { flex: 1; border: 0; width: 100%; background: var(--bg); }
+    .pane.flash h2 { color: var(--accent); }
+
+    /* fake Claude composer */
+    .claude { background: #262624; }
+    .claude .chat { flex: 1; overflow-y: auto; padding: 16px; }
+    .claude .hint { color: #b8b5ad; text-align: center; margin-top: 40px; }
+    .claude .injected-note { color: #b8b5ad; font-size: 12px; margin: 8px 4px; }
+    .composer {
+      margin: 12px; background: #30302e; border: 1px solid #4a4a46;
+      border-radius: 16px; padding: 12px; min-height: 88px;
+    }
+    .composer .placeholder { color: #87857d; }
+    .composer .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .composer figure { margin: 0; }
+    .composer figure img {
+      display: block; max-width: 150px; max-height: 110px; border-radius: 8px;
+      border: 1px solid #4a4a46;
+    }
+    .composer figcaption {
+      font-size: 10px; color: #87857d; max-width: 150px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .composer .text-bubble {
+      background: #3a3a37; border-radius: 8px; padding: 8px 10px;
+      white-space: pre-wrap; word-break: break-all; color: #e8e6e0; font-size: 12px;
+    }
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,.8); display: none;
+      align-items: center; justify-content: center; cursor: zoom-out; z-index: 99;
+    }
+    .lightbox img { max-width: 92%; max-height: 92%; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="brand">Shotcache 演示台</span>
+    <span class="note">真实构建产物 + mock 扩展 API · captureVisibleTab 用合成页面截图代替 · 右侧为模拟 composer</span>
+    <button id="recapture">↺ 重新生成截图</button>
+  </header>
+  <main>
+    <section class="pane" id="pane-editor">
+      <h2>editor.html — 标注编辑器（真实产物）</h2>
+      <iframe id="editor" src="about:blank"></iframe>
+    </section>
+    <section class="pane" id="pane-sidepanel">
+      <h2>sidepanel.html — 托盘（真实产物）</h2>
+      <iframe id="sidepanel" src="/sidepanel.html"></iframe>
+    </section>
+    <section class="pane claude" id="pane-claude">
+      <h2 id="claude-title">模拟 claude.ai composer（等待注入…）</h2>
+      <div class="chat" id="chat"><div class="hint">勾选托盘条目并点「发送」，<br/>注入结果会出现在下方输入框里。</div></div>
+      <div class="composer">
+        <div class="chips" id="chips"></div>
+        <div class="placeholder" id="composer-text">给 Claude 发送消息…</div>
+      </div>
+    </section>
+  </main>
+  <div class="lightbox" id="lightbox"><img id="lightbox-img" alt="原图" /></div>
+
+  <script>
+    // --- IndexedDB helpers (mirror shared/db.ts: db "shotcache" v1, stores tray/pending) ---
+    function openDb() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open('shotcache', 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains('tray')) db.createObjectStore('tray', { keyPath: 'id' });
+          if (!db.objectStoreNames.contains('pending')) db.createObjectStore('pending', { keyPath: 'id' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    function idb(store, mode, fn) {
+      return openDb().then((db) => new Promise((resolve, reject) => {
+        const t = db.transaction(store, mode);
+        const r = fn(t.objectStore(store));
+        r.onsuccess = () => resolve(r.result);
+        r.onerror = () => reject(r.error);
+        t.oncomplete = () => db.close();
+      }));
+    }
+
+    // --- synthetic "webpage screenshot" (stands in for captureVisibleTab) ---
+    function drawFakePage() {
+      const c = document.createElement('canvas');
+      c.width = 1280; c.height = 800;
+      const g = c.getContext('2d');
+      g.fillStyle = '#ffffff'; g.fillRect(0, 0, 1280, 800);
+      const grad = g.createLinearGradient(0, 0, 1280, 0);
+      grad.addColorStop(0, '#4f8cff'); grad.addColorStop(1, '#3e6fe0');
+      g.fillStyle = grad; g.fillRect(0, 0, 1280, 64);
+      g.fillStyle = '#fff'; g.font = 'bold 22px system-ui';
+      g.fillText('Example Dev Blog', 32, 40);
+      g.font = '14px system-ui'; g.globalAlpha = .9;
+      g.fillText('首页      文档      API      关于', 1020, 40); g.globalAlpha = 1;
+      g.fillStyle = '#16181d'; g.font = 'bold 30px system-ui';
+      g.fillText('MV3 扩展的权限模型：activeTab 与 host_permissions', 180, 160);
+      g.fillStyle = '#8b93a1'; g.font = '13px system-ui';
+      g.fillText('2026-06-11 · 阅读 8 分钟 · Example Dev Blog', 180, 188);
+      g.fillStyle = '#d8dbe2';
+      for (let i = 0; i < 5; i++) g.fillRect(180, 216 + i * 24, i === 4 ? 420 : 700, 12);
+      // credential card (mosaic target)
+      g.fillStyle = '#fff7e6'; g.fillRect(180, 360, 430, 56);
+      g.strokeStyle = '#ffd591'; g.strokeRect(180, 360, 430, 56);
+      g.fillStyle = '#ad6800'; g.font = '13px system-ui';
+      g.fillText('内部凭据（截图外发前请打码）', 196, 382);
+      g.fillStyle = '#16181d'; g.font = 'bold 15px monospace';
+      g.fillText('API_KEY = sk-demo-9f27-SECRET-c41a', 196, 406);
+      // bar chart (rect-annotation target)
+      g.fillStyle = '#16181d'; g.font = 'bold 15px system-ui';
+      g.fillText('扩展安装量（周）', 700, 330);
+      [42, 60, 84, 70, 110, 132, 96].forEach((h, i) => {
+        g.fillStyle = i === 5 ? '#ff4d4f' : '#4f8cff';
+        g.fillRect(700 + i * 42, 480 - h, 26, h);
+      });
+      g.strokeStyle = '#cfd3da'; g.beginPath(); g.moveTo(695, 482); g.lineTo(1000, 482); g.stroke();
+      // CTA button (arrow target)
+      g.fillStyle = '#22c55e';
+      g.beginPath(); g.roundRect(180, 470, 150, 40, 8); g.fill();
+      g.fillStyle = '#fff'; g.font = 'bold 15px system-ui';
+      g.fillText('下载示例代码', 210, 495);
+      g.fillStyle = '#e7e9ee';
+      for (let i = 0; i < 3; i++) g.fillRect(180, 560 + i * 22, 640, 10);
+      return c.toDataURL('image/png');
+    }
+
+    async function seedCapture() {
+      const id = 'demo-' + Math.random().toString(36).slice(2, 8);
+      await idb('pending', 'readwrite', (s) => s.put({
+        id,
+        createdAt: Date.now(),
+        dataUrl: drawFakePage(),
+        rect: { x: 150, y: 120, w: 880, h: 420 },
+        dpr: 1,
+        sourceUrl: 'https://example.com/articles/mv3-permissions',
+        sourceTitle: 'MV3 扩展的权限模型 · Example Dev Blog',
+      }));
+      document.getElementById('editor').src = '/editor.html?capture=' + id;
+    }
+
+    // --- the shell plays "background + claude.ai": handle runtime messages ---
+    const TARGET_LABELS = { claude: 'Claude', chatgpt: 'ChatGPT', gemini: 'Gemini' };
+
+    window.addEventListener('message', async (e) => {
+      const d = e.data;
+      if (!d || typeof d !== 'object') return;
+      if (d.kind === 'runtime') {
+        const msg = d.msg;
+        if (msg?.type === 'SEND_ITEMS') await renderComposer(msg.target, msg.itemIds);
+        if (msg?.type === 'REQUEST_CAPTURE') await seedCapture();
+        if (msg?.type === 'TRAY_UPDATED') flash('pane-sidepanel');
+      } else if (d.kind === 'open-url') {
+        const lb = document.getElementById('lightbox');
+        document.getElementById('lightbox-img').src = d.url;
+        lb.style.display = 'flex';
+      } else if (d.kind === 'open-sidepanel') {
+        flash('pane-sidepanel');
+      }
+    });
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+      e.currentTarget.style.display = 'none';
+    });
+
+    async function renderComposer(target, itemIds) {
+      const chips = document.getElementById('chips');
+      chips.replaceChildren();
+      let texts = [];
+      for (const id of itemIds) {
+        const item = await idb('tray', 'readonly', (s) => s.get(id));
+        if (!item) continue;
+        if (item.kind === 'image' && item.blob) {
+          const fig = document.createElement('figure');
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(item.blob);
+          const cap = document.createElement('figcaption');
+          cap.textContent = item.title + '.png';
+          fig.append(img, cap);
+          chips.append(fig);
+        } else {
+          texts.push(item.text || '');
+        }
+      }
+      if (texts.length) {
+        const bubble = document.createElement('div');
+        bubble.className = 'text-bubble';
+        bubble.textContent = texts.join('\n\n');
+        chips.append(bubble);
+      }
+      document.getElementById('composer-text').textContent = '给 ' + (TARGET_LABELS[target] ?? target) + ' 发送消息…';
+      document.getElementById('claude-title').textContent =
+        '模拟 ' + (TARGET_LABELS[target] ?? target) + ' composer — 已注入 ' + itemIds.length + ' 个条目 ✓';
+      document.getElementById('chat').innerHTML =
+        '<div class="injected-note">⬇ 合成 paste 事件已把以下内容送进输入框（真实站点中由其上传管线接手）</div>';
+      flash('pane-claude');
+    }
+
+    function flash(paneId) {
+      const el = document.getElementById(paneId);
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 1200);
+    }
+
+    document.getElementById('recapture').addEventListener('click', () => void seedCapture());
+    void seedCapture();
+  </script>
+</body>
+</html>

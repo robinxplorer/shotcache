@@ -1,0 +1,16 @@
+node_modules/
+docs/
+.output/
+.wxt/
+*.log
+.git/
+.idea/
+.vscode/
+
+# native host build outputs (machine-specific absolute paths inside)
+native-host/shotcache-host.exe
+native-host/shotcache-host.exe.*
+native-host/com.shotcache.capture.json
+
+.claude/
+CLAUDE.md

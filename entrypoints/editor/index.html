@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>截存 · 标注</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="bar">
+      <span class="brand">截存</span>
+      <div class="tools" id="tools">
+        <button data-tool="select" class="tool" title="选择 / 移动 (V)">⬚</button>
+        <button data-tool="rect" class="tool active" title="矩形 (R)">▭</button>
+        <button data-tool="ellipse" class="tool" title="椭圆 (E)">◯</button>
+        <button data-tool="arrow" class="tool" title="箭头 (A)">↗</button>
+        <button data-tool="text" class="tool" title="文字 (T)">T</button>
+        <button data-tool="mosaic" class="tool" title="马赛克 (M)">▦</button>
+        <button data-tool="emoji" class="tool" title="表情 (J)">😀</button>
+        <span class="sep"></span>
+        <button id="undo" title="撤销 (Ctrl+Z)">⟲ 撤销</button>
+      </div>
+      <div class="actions">
+        <button id="theme" title="切换深色 / 浅色">🌗</button>
+        <button id="copy">复制</button>
+        <button id="download">下载</button>
+        <button id="save" class="primary">存入托盘</button>
+      </div>
+    </header>
+    <div class="stylebar">
+      <div class="widths" id="widths">
+        <button data-tier="0">细</button>
+        <button data-tier="1" class="active">中</button>
+        <button data-tier="2">粗</button>
+      </div>
+      <span class="sep"></span>
+      <div class="swatches" id="swatches"></div>
+      <div class="emojis" id="emojis" hidden></div>
+    </div>
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+    </main>
+    <footer class="status" id="status">加载中…</footer>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>截存 · 框选</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="hint" id="hint">
+      <span>在屏幕截图上拖拽选择区域 · Esc 取消</span>
+      <button id="use-full">使用全图</button>
+    </div>
+    <main class="stage" id="stage">
+      <img id="shot" alt="" draggable="false" />
+      <div class="box" id="box" hidden></div>
+      <div class="size" id="size" hidden></div>
+    </main>
+    <div class="fail" id="fail" hidden>截图已过期，请重新捕获</div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

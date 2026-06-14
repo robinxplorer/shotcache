@@ -1,0 +1,52 @@
+:root {
+  /* Ink + Violet (dark, default). Companion light theme below. */
+  --bg: #141317;
+  --line: #2f2d36;
+  --text: #ece9f1;
+  --muted: #989299;
+  --accent: #8b7cf0;
+}
+:root[data-theme="light"] {
+  --bg: #f6f5f9;
+  --line: #e7e3ef;
+  --text: #211e29;
+  --muted: #6f6a78;
+  --accent: #6d5ce6;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%;
+  background: var(--bg); color: var(--text);
+  font: 14px/1.6 system-ui, "Segoe UI", sans-serif;
+}
+body { display: flex; flex-direction: column; }
+.hint {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  z-index: 10; display: flex; align-items: center; gap: 12px;
+  font-size: 13px; color: #fff;
+  background: rgba(20, 20, 24, .85); padding: 6px 14px; border-radius: 8px;
+}
+.hint button {
+  background: var(--accent); color: #fff; border: none; border-radius: 6px;
+  padding: 4px 10px; font: inherit; cursor: pointer;
+}
+.stage {
+  flex: 1; display: grid; place-items: center; padding: 24px;
+  cursor: crosshair; user-select: none; overflow: hidden;
+}
+#shot {
+  max-width: 100%; max-height: calc(100vh - 48px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, .5);
+}
+.box {
+  position: fixed; pointer-events: none;
+  border: 1px solid var(--accent); background: rgba(139, 124, 240, .14);
+}
+.size {
+  position: fixed; pointer-events: none;
+  font: 12px/1 monospace; color: #fff;
+  background: rgba(20, 20, 24, .85); padding: 3px 6px; border-radius: 4px;
+}
+.fail {
+  position: fixed; inset: 0; display: grid; place-items: center; color: var(--muted);
+}
